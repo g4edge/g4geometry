@@ -29,23 +29,26 @@ include(${Geant4_USE_FILE})
 find_package(CGAL 5 REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Catch2 REQUIRED)
+find_package(OpenCASCADE CONFIG REQUIRED COMPONENTS FoundationClasses ModelingData DataExchange)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 #
-include_directories(${PROJECT_SOURCE_DIR}/include 
-                    ${Geant4_INCLUDE_DIR})
-
 file(GLOB CADSources ${PROJECT_SOURCE_DIR}/src/G4CAD*cc)
 file(GLOB CADHeaders ${PROJECT_SOURCE_DIR}/include/G4CAD*.hh)
 add_library(g4cad SHARED ${CADSources} ${CADHeaders})
 target_compile_options(g4cad PRIVATE -Werror )
-target_link_libraries(g4cad ${Geant4_LIBRARIES} )
+target_include_directories(g4cad
+                           PUBLIC ${PROJECT_SOURCE_DIR}/include
+                           PRIVATE ${Geant4_INCLUDE_DIR})
+target_link_libraries(g4cad PRIVATE ${Geant4_LIBRARIES})
+target_link_libraries(g4cad PRIVATE
+                      OpenCASCADE::FoundationClasses
+                      OpenCASCADE::ModelingData
+                      OpenCASCADE::DataExchange)
 
 #file(GLOB CADTestSources ${PROJECT_SOURCE_DIR}/test_cad/*cc)
 #file(GLOB CADTestHeaders ${PROJECT_SOURCE_DIR}/test_cad/*hh)
 #add_executable(cad_test ${CADTestSources} ${CADTestHeaders})
 #target_compile_options(cad_test PRIVATE -Werror)
 #target_link_libraries(cad_test ${Geant4_LIBRARIES} g4halfspace)
-
-
