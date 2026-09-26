@@ -40,10 +40,21 @@ add_library(g4cad SHARED ${CADSources} ${CADHeaders})
 target_compile_options(g4cad PRIVATE -Werror )
 target_include_directories(g4cad
                            PUBLIC ${PROJECT_SOURCE_DIR}/include
-                           PRIVATE ${OpenCASCADE_INCLUDE_DIR}
                            PRIVATE ${Geant4_INCLUDE_DIR})
 target_link_libraries(g4cad PRIVATE ${Geant4_LIBRARIES})
-target_link_libraries(g4cad PRIVATE ${OpenCASCADE_LIBRARIES})
+target_link_libraries(g4cad PRIVATE
+                      TKernel
+                      TKMath
+                      TKG2d
+                      TKG3d
+                      TKGeomBase
+                      TKBRep
+                      TKXSBase
+                      TKIGES
+                      TKSTEP
+                      TKSTEP209
+                      TKSTEPAttr
+                      TKSTEPBase)
 
 #file(GLOB CADTestSources ${PROJECT_SOURCE_DIR}/test_cad/*cc)
 #file(GLOB CADTestHeaders ${PROJECT_SOURCE_DIR}/test_cad/*hh)

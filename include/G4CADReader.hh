@@ -21,7 +21,6 @@ public:
     G4CADReader(G4CADReader&&) noexcept;
     G4CADReader& operator=(G4CADReader&&) noexcept;
     void Read(const std::string& filePath, G4CADFileFormat format = G4CADFileFormat::Auto);
-    void Read(const std::string& filePath, G4CADFileFormat format = G4CADFileFormat::Auto);
     [[nodiscard]] bool HasShape() const;
 
 private:
