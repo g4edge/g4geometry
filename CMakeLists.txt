@@ -43,18 +43,9 @@ target_include_directories(g4cad
                            PRIVATE ${Geant4_INCLUDE_DIR})
 target_link_libraries(g4cad PRIVATE ${Geant4_LIBRARIES})
 target_link_libraries(g4cad PRIVATE
-                      TKernel
-                      TKMath
-                      TKG2d
-                      TKG3d
-                      TKGeomBase
-                      TKBRep
-                      TKXSBase
-                      TKIGES
-                      TKSTEP
-                      TKSTEP209
-                      TKSTEPAttr
-                      TKSTEPBase)
+                      OpenCASCADE::FoundationClasses
+                      OpenCASCADE::ModelingData
+                      OpenCASCADE::DataExchange)
 
 #file(GLOB CADTestSources ${PROJECT_SOURCE_DIR}/test_cad/*cc)
 #file(GLOB CADTestHeaders ${PROJECT_SOURCE_DIR}/test_cad/*hh)
