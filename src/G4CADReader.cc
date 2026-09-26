@@ -28,6 +28,13 @@ void EnsureReadSuccess(IFSelect_ReturnStatus status, const std::string& filePath
     }
 }
 
+void EnsureTransferSuccess(Standard_Integer transferredRoots, const std::string& filePath, const char* format)
+{
+    if (transferredRoots <= 0) {
+        throw std::runtime_error("Failed to translate " + std::string(format) + " geometry: " + filePath);
+    }
+}
+
 }
 
 G4CADFileFormat G4CADReader::ResolveFormat(const std::string& filePath, G4CADFileFormat format)
@@ -61,14 +68,14 @@ void G4CADReader::Read(const std::string& filePath, G4CADFileFormat format)
         case G4CADFileFormat::STEP: {
             STEPControl_Reader reader;
             EnsureReadSuccess(reader.ReadFile(filePath.c_str()), filePath, "STEP");
-            reader.TransferRoots();
+            EnsureTransferSuccess(reader.TransferRoots(), filePath, "STEP");
             m_shape = reader.OneShape();
             break;
         }
         case G4CADFileFormat::IGES: {
             IGESControl_Reader reader;
             EnsureReadSuccess(reader.ReadFile(filePath.c_str()), filePath, "IGES");
-            reader.TransferRoots();
+            EnsureTransferSuccess(reader.TransferRoots(), filePath, "IGES");
             m_shape = reader.OneShape();
             break;
         }
