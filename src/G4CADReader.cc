@@ -73,7 +73,11 @@ G4CADFileFormat G4CADReader::ResolveFormat(const std::string& filePath, G4CADFil
         return G4CADFileFormat::BREP;
     }
 
-    throw std::invalid_argument("Unsupported CAD file extension: " + extension);
+    if (extension.empty()) {
+        throw std::invalid_argument("Could not determine CAD format from file path: " + filePath);
+    }
+
+    throw std::invalid_argument("Unsupported CAD file extension '" + extension + "' for file: " + filePath);
 }
 
 void G4CADReader::Read(const std::string& filePath, G4CADFileFormat format)
@@ -104,17 +108,12 @@ void G4CADReader::Read(const std::string& filePath, G4CADFileFormat format)
             break;
         }
         case G4CADFileFormat::Auto:
-            break;
+            throw std::logic_error("Automatic CAD format resolution did not produce a concrete format");
     }
 
     if (m_impl->shape.IsNull()) {
         throw std::runtime_error("Loaded CAD file did not produce a shape: " + filePath);
     }
-}
-
-const TopoDS_Shape& G4CADReader::GetShape() const
-{
-    return m_impl->shape;
 }
 
 bool G4CADReader::HasShape() const

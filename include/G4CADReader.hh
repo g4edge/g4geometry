@@ -11,8 +11,6 @@ enum class G4CADFileFormat {
     BREP
 };
 
-class TopoDS_Shape;
-
 class G4CADReader {
 public:
     G4CADReader();
@@ -22,9 +20,8 @@ public:
     G4CADReader& operator=(const G4CADReader&) = delete;
     G4CADReader(G4CADReader&&) noexcept;
     G4CADReader& operator=(G4CADReader&&) noexcept;
-
     void Read(const std::string& filePath, G4CADFileFormat format = G4CADFileFormat::Auto);
-    [[nodiscard]] const TopoDS_Shape& GetShape() const;
+    void Read(const std::string& filePath, G4CADFileFormat format = G4CADFileFormat::Auto);
     [[nodiscard]] bool HasShape() const;
 
 private:
