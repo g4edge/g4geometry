@@ -29,38 +29,7 @@ include(${Geant4_USE_FILE})
 find_package(CGAL 5 REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Catch2 REQUIRED)
-find_package(OpenCASCADE REQUIRED COMPONENTS FoundationClasses ModelingData DataExchange)
-
-set(G4CAD_OCCT_LINK_LIBRARIES
-    TKernel
-    TKMath
-    TKG2d
-    TKG3d
-    TKGeomBase
-    TKBRep
-    TKXSBase
-    TKIGES
-    TKSTEP
-    TKSTEP209
-    TKSTEPAttr
-    TKSTEPBase)
-
-set(G4CAD_OCCT_INCLUDE_DIRS)
-if(TARGET TKernel)
-  get_target_property(G4CAD_OCCT_INCLUDE_DIRS TKernel INTERFACE_INCLUDE_DIRECTORIES)
-endif()
-
-if(NOT G4CAD_OCCT_INCLUDE_DIRS AND DEFINED OpenCASCADE_INCLUDE_DIR)
-  list(APPEND G4CAD_OCCT_INCLUDE_DIRS ${OpenCASCADE_INCLUDE_DIR})
-endif()
-
-if(NOT TARGET TKernel)
-  if(DEFINED OpenCASCADE_LIBRARIES)
-    set(G4CAD_OCCT_LINK_LIBRARIES ${OpenCASCADE_LIBRARIES})
-  else()
-    message(FATAL_ERROR "OpenCASCADE package does not expose imported targets or OpenCASCADE_LIBRARIES")
-  endif()
-endif()
+find_package(OpenCASCADE CONFIG REQUIRED COMPONENTS FoundationClasses ModelingData DataExchange)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -71,10 +40,10 @@ add_library(g4cad SHARED ${CADSources} ${CADHeaders})
 target_compile_options(g4cad PRIVATE -Werror )
 target_include_directories(g4cad
                            PUBLIC ${PROJECT_SOURCE_DIR}/include
-                           PUBLIC ${G4CAD_OCCT_INCLUDE_DIRS}
+                           PUBLIC ${OpenCASCADE_INCLUDE_DIR}
                            PRIVATE ${Geant4_INCLUDE_DIR})
 target_link_libraries(g4cad PRIVATE ${Geant4_LIBRARIES})
-target_link_libraries(g4cad PUBLIC ${G4CAD_OCCT_LINK_LIBRARIES})
+target_link_libraries(g4cad PUBLIC ${OpenCASCADE_LIBRARIES})
 
 #file(GLOB CADTestSources ${PROJECT_SOURCE_DIR}/test_cad/*cc)
 #file(GLOB CADTestHeaders ${PROJECT_SOURCE_DIR}/test_cad/*hh)
