@@ -1,9 +1,8 @@
 #ifndef GEANT4GEOMETRY_G4CADREADER_HH
 #define GEANT4GEOMETRY_G4CADREADER_HH
 
+#include <memory>
 #include <string>
-
-#include <TopoDS_Shape.hxx>
 
 enum class G4CADFileFormat {
     Auto,
@@ -12,19 +11,28 @@ enum class G4CADFileFormat {
     BREP
 };
 
+class TopoDS_Shape;
+
 class G4CADReader {
 public:
-    G4CADReader() = default;
-    virtual ~G4CADReader() = default;
+    G4CADReader();
+    ~G4CADReader();
+
+    G4CADReader(const G4CADReader&) = delete;
+    G4CADReader& operator=(const G4CADReader&) = delete;
+    G4CADReader(G4CADReader&&) noexcept;
+    G4CADReader& operator=(G4CADReader&&) noexcept;
 
     void Read(const std::string& filePath, G4CADFileFormat format = G4CADFileFormat::Auto);
     [[nodiscard]] const TopoDS_Shape& GetShape() const;
     [[nodiscard]] bool HasShape() const;
 
 private:
+    class Impl;
+
     static G4CADFileFormat ResolveFormat(const std::string& filePath, G4CADFileFormat format);
 
-    TopoDS_Shape m_shape;
+    std::unique_ptr<Impl> m_impl;
 };
 
 #endif //GEANT4GEOMETRY_G4CADREADER_HH

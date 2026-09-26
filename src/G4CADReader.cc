@@ -4,12 +4,14 @@
 #include <cctype>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <BRep_Builder.hxx>
 #include <BRepTools.hxx>
 #include <IFSelect_ReturnStatus.hxx>
 #include <IGESControl_Reader.hxx>
 #include <STEPControl_Reader.hxx>
+#include <TopoDS_Shape.hxx>
 
 namespace {
 
@@ -37,6 +39,21 @@ void EnsureTransferSuccess(Standard_Integer transferredRoots, const std::string&
 
 }
 
+class G4CADReader::Impl {
+public:
+    TopoDS_Shape shape;
+};
+
+G4CADReader::G4CADReader() : m_impl(std::make_unique<Impl>())
+{
+}
+
+G4CADReader::~G4CADReader() = default;
+
+G4CADReader::G4CADReader(G4CADReader&&) noexcept = default;
+
+G4CADReader& G4CADReader::operator=(G4CADReader&&) noexcept = default;
+
 G4CADFileFormat G4CADReader::ResolveFormat(const std::string& filePath, G4CADFileFormat format)
 {
     if (format != G4CADFileFormat::Auto) {
@@ -62,26 +79,26 @@ G4CADFileFormat G4CADReader::ResolveFormat(const std::string& filePath, G4CADFil
 void G4CADReader::Read(const std::string& filePath, G4CADFileFormat format)
 {
     const G4CADFileFormat resolvedFormat = ResolveFormat(filePath, format);
-    m_shape = TopoDS_Shape();
+    m_impl->shape = TopoDS_Shape();
 
     switch (resolvedFormat) {
         case G4CADFileFormat::STEP: {
             STEPControl_Reader reader;
             EnsureReadSuccess(reader.ReadFile(filePath.c_str()), filePath, "STEP");
             EnsureTransferSuccess(reader.TransferRoots(), filePath, "STEP");
-            m_shape = reader.OneShape();
+            m_impl->shape = reader.OneShape();
             break;
         }
         case G4CADFileFormat::IGES: {
             IGESControl_Reader reader;
             EnsureReadSuccess(reader.ReadFile(filePath.c_str()), filePath, "IGES");
             EnsureTransferSuccess(reader.TransferRoots(), filePath, "IGES");
-            m_shape = reader.OneShape();
+            m_impl->shape = reader.OneShape();
             break;
         }
         case G4CADFileFormat::BREP: {
             BRep_Builder builder;
-            if (!BRepTools::Read(m_shape, filePath.c_str(), builder)) {
+            if (!BRepTools::Read(m_impl->shape, filePath.c_str(), builder)) {
                 throw std::runtime_error("Failed to read BREP file: " + filePath);
             }
             break;
@@ -90,17 +107,17 @@ void G4CADReader::Read(const std::string& filePath, G4CADFileFormat format)
             break;
     }
 
-    if (m_shape.IsNull()) {
+    if (m_impl->shape.IsNull()) {
         throw std::runtime_error("Loaded CAD file did not produce a shape: " + filePath);
     }
 }
 
 const TopoDS_Shape& G4CADReader::GetShape() const
 {
-    return m_shape;
+    return m_impl->shape;
 }
 
 bool G4CADReader::HasShape() const
 {
-    return !m_shape.IsNull();
+    return !m_impl->shape.IsNull();
 }
