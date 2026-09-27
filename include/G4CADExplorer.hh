@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <iostream>
+#include <Standard_Real.hxx>
 
 class TopoDS_Shape;
 class TopoDS_Face;
@@ -24,6 +25,9 @@ private:
 
 void PrintFaceInfo(const TopoDS_Face& face, std::ostream& os = std::cout);
 void PrintEdgeInfo(const TopoDS_Edge& edge, std::ostream& os = std::cout);
+
+bool IsEdgePlanar(const TopoDS_Edge & edge, Standard_Real tol = 1e-6);
+bool IsEdgeLinear(const TopoDS_Edge & edge, Standard_Real tol = 1e-6);
 
 
 #endif // GEANT4GEOMETRY_G4CADEXPLORER_HH

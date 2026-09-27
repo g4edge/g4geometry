@@ -15,7 +15,8 @@
 #include "BRepAdaptor_Curve.hxx"
 #include "BRepGProp.hxx"
 #include "BRepTools.hxx"
-#include <GProp_GProps.hxx>
+#include "GProp_GProps.hxx"
+#include "GProp_PEquation.hxx"
 #include <BRepBndLib.hxx>
 
 class G4CADExplorer::Impl {
@@ -95,8 +96,12 @@ void G4CADExplorer::ExploreTopology(const TopoDS_Shape& shape, int depth)
                 shape.Orientation() == TopAbs_REVERSED ? "REV" : "OTHER")
             << "]\n";
 
-  it.Value().ShapeType() == TopAbs_FACE ? PrintFaceInfo(TopoDS::Face(it.Value())) : void();
-  it.Value().ShapeType() == TopAbs_EDGE ? PrintEdgeInfo(TopoDS::Edge(it.Value())) : void();
+  shape.ShapeType() == TopAbs_FACE ? PrintFaceInfo(TopoDS::Face(shape)) : void();
+  if (shape.ShapeType() == TopAbs_EDGE) {
+    PrintEdgeInfo(TopoDS::Edge(shape));
+    std::cout << indent << "  Is linear: " << (IsEdgeLinear(TopoDS::Edge(shape)) ? "yes" : "no") << "\n";
+    std::cout << indent << "  Is planar: " << (IsEdgePlanar(TopoDS::Edge(shape)) ? "yes" : "no") << "\n";
+  }
 
   // TopoDS_Iterator walks immediate children only (one level down),
   // respecting the natural containment hierarchy (compound->solid->shell->face->wire->edge->vertex)
@@ -312,4 +317,42 @@ void PrintEdgeInfo(const TopoDS_Edge& edge, std::ostream& os)
   }
 
   os << "----------------------\n";
+}
+
+bool IsEdgePlanar(const TopoDS_Edge & edge, Standard_Real tol)
+{
+  //
+  Standard_Real first, last; // will be filled with the edge's parameter range on the curve
+  Handle(Geom_Curve) curve = BRep_Tool::Curve(edge, first, last);
+
+  // Sample points along the curve
+  TColgp_Array1OfPnt points(1, 50);
+  first = curve->FirstParameter();
+  last  = curve->LastParameter();
+  for (int i = 1; i <= 50; ++i) {
+    Standard_Real t = first + (last - first) * (i - 1) / 49.0;
+    points(i) = curve->Value(t);
+  }
+
+  GProp_PEquation fitter(points, tol);
+  return fitter.IsPlanar();  // also gives fitter.Plane() if true
+}
+
+bool IsEdgeLinear(const TopoDS_Edge & edge, Standard_Real tol)
+{
+  //
+  Standard_Real first, last; // will be filled with the edge's parameter range on the curve
+  Handle(Geom_Curve) curve = BRep_Tool::Curve(edge, first, last);
+
+  // Sample points along the curve
+  TColgp_Array1OfPnt points(1, 50);
+  first = curve->FirstParameter();
+  last  = curve->LastParameter();
+  for (int i = 1; i <= 50; ++i) {
+    Standard_Real t = first + (last - first) * (i - 1) / 49.0;
+    points(i) = curve->Value(t);
+  }
+
+  GProp_PEquation fitter(points, tol);
+  return fitter.IsLinear();  // also gives fitter.Plane() if true
 }
