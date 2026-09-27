@@ -120,3 +120,8 @@ bool G4CADReader::HasShape() const
 {
     return !m_impl->shape.IsNull();
 }
+
+TopoDS_Shape& G4CADReader::GetShape() const
+{
+    return m_impl->shape;
+}

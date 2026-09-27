@@ -45,8 +45,6 @@ target_include_directories(g4cad
 target_link_libraries(g4cad PRIVATE ${Geant4_LIBRARIES})
 target_link_libraries(g4cad PRIVATE ${OpenCASCADE_DataExchange_LIBRARIES})
 
-#file(GLOB CADTestSources ${PROJECT_SOURCE_DIR}/test_cad/*cc)
-#file(GLOB CADTestHeaders ${PROJECT_SOURCE_DIR}/test_cad/*hh)
-#add_executable(cad_test ${CADTestSources} ${CADTestHeaders})
-#target_compile_options(cad_test PRIVATE -Werror)
-#target_link_libraries(cad_test ${Geant4_LIBRARIES} g4halfspace)
+add_executable(cad_reader_test ${PROJECT_SOURCE_DIR}/test/cad/reader.cc)
+target_include_directories(cad_reader_test PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(cad_reader_test ${Geant4_LIBRARIES} ${OpenCASCADE_DataExchange_LIBRARIES} g4cad)
