@@ -1,5 +1,6 @@
 #include "G4CADReader.hh"
 #include "G4CADExplorer.hh"
+#include "G4CADViewer.hh"
 
 #include <iostream>
 
@@ -19,6 +20,8 @@ int main(int argc, char** argv)
     G4CADExplorer explorer;
     explorer.ExploreTopology(reader.GetShape());
 
+    G4CADViewer viewer;
+    viewer.DisplayShape(reader.GetShape());
 
     return 0;
 }

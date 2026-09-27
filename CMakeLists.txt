@@ -31,6 +31,14 @@ find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Catch2 REQUIRED)
 find_package(OpenCASCADE)
 find_package(OpenCASCADE COMPONENTS FoundationClasses ModelingData DataExchange REQUIRED)
+find_package(VTK REQUIRED COMPONENTS
+        CommonCore
+        CommonColor
+        CommonDataModel
+        InteractionStyle
+        RenderingCore
+        RenderingOpenGL2
+)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -44,7 +52,9 @@ target_include_directories(g4cad
                            PRIVATE ${Geant4_INCLUDE_DIR})
 target_link_libraries(g4cad PRIVATE ${Geant4_LIBRARIES})
 target_link_libraries(g4cad PRIVATE ${OpenCASCADE_DataExchange_LIBRARIES})
+target_link_libraries(g4cad PRIVATE ${VTK_LIBRARIES})
 
 add_executable(cad_reader_test ${PROJECT_SOURCE_DIR}/test/cad/reader.cc)
 target_include_directories(cad_reader_test PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(cad_reader_test ${Geant4_LIBRARIES} ${OpenCASCADE_DataExchange_LIBRARIES} g4cad)
+vtk_module_autoinit( TARGETS cad_reader_test  MODULES ${VTK_LIBRARIES})
