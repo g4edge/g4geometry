@@ -1,4 +1,6 @@
 #include "G4CADReader.hh"
+#include "G4CADExplorer.hh"
+
 #include <iostream>
 
 int main(int argc, char** argv)
@@ -13,5 +15,10 @@ int main(int argc, char** argv)
     if (reader.HasShape()) {
       std::cout << "Successfully loaded the shape from " << argv[1] << std::endl;
     }
+
+    G4CADExplorer explorer;
+    explorer.ExploreTopology(reader.GetShape());
+
+
     return 0;
 }

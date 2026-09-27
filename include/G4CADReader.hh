@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+class TopoDS_Shape;
+
 enum class G4CADFileFormat {
     Auto,
     STEP,
@@ -26,6 +28,7 @@ public:
     // Throws std::invalid_argument for unsupported formats and std::runtime_error when OCCT cannot load the file.
     void Read(const std::string& filePath, G4CADFileFormat format = G4CADFileFormat::Auto);
     [[nodiscard]] bool HasShape() const;
+    TopoDS_Shape& GetShape() const;
 
 private:
     class Impl;
